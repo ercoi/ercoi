@@ -1,0 +1,66 @@
+# read V vector from matlab
+VV=pd.read_table('VV.txt',header=none)
+k = cov(VV)
+
+VV=np.array(VV)
+
+u,s,vh=np.linalg.svd(k)
+
+pc = np.dot(VV,u)
+
+# VV : v vector of Image data set
+# group_count : # of image category
+# d : # of PC 
+# size : # of data of each category
+
+# Feature of LDA : use each groups mean, pooled Covariance when doing Multivariate Normal Distribution
+def lda_vv(VV,group_count,d,size):
+    #Covariance of V vector)
+    k=np.cov(VV.T)
+    
+    #Singular Value Decomposition
+    u,s,vh=np.linalg.svd(k)
+    
+    #Get Principal Component
+    PC=np.dot(VV,u)
+    prev_ind=0
+    index=0
+    result=pd.DataFrame()
+    
+    # MVN(Multivariate Normal Distribution)
+    for i in range(group_count):
+        prev_ind=index
+        index=index+size[i]
+        globals()['group{}'.format(i)] = PC[prev_ind:index]
+        globals()['mean{}'.format(i)] = np.mean(globals()['group{}'.format(i)][:,:d],axis=0)
+        globals()['cov{}'.format(i)] = np.cov(globals()['group{}'.format(i)][:,:d].T)
+        # Get Pooled covariance
+        globals()['cov{}'.format(i)]
+        if i==0:
+            cum=np.zeros(cov0.shape)
+        elif i==group_count-1:
+            cum=cum+globals()['cov{}'.format(i)]
+            cum=cum/group_count
+        else:
+            cum=cum+globals()['cov{}'.format(i)]
+    result=pd.DataFrame([],columns=['group'])
+    
+    # make df using result of each data by LDA
+    for j in range(len(VV)):
+        li=[]
+        for i in range(group_count):
+            globals()['mvn{}'.format(i)] = mvd.MVNormal(globals()['mean{}'.format(i)],cum)
+            globals()['logmvn{}'.format(i)] = globals()['mvn{}'.format(i)].logpdf(PC[j,:d])
+            li.append(globals()['logmvn{}'.format(i)])
+            max_value=max(li)
+        vali=li.index(max_value)+1
+        result.loc[j]=vali
+    length=list(range(1,group_count+1))
+    corr=np.repeat(np.array(length), size)
+    result['real_group']=corr
+    
+    # check the correction rate of model
+    print(sum(result['group']==result['real_group'])*100/len(VV),'%')
+    
+    # return the result of LDA
+    return result
