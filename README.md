@@ -1,6 +1,6 @@
 - 👋 Hi, I’m Joonmyoung Lee who a master student in the Department of Statistics, Inha University
 - 👀 I’m interested in Shape analysis, Image classification
-- 🌱 I’m currently learning Shape analysis using Logistic Regression, LDA, QDA by Matlab, Python
+- 🌱 I’m currently learning Shape analysis using Logistic Regression, LDA, QDA by Matlab & Python
 - 📫 Contact me jmlee9612@naver.com
 
 <!---
